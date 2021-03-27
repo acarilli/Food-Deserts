@@ -1,0 +1,885 @@
+---
+title: "Untitled"
+author: "Carilli"
+date: "3/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(rio)
+library(janitor)
+library(stringi)
+library(hablar)
+
+add_data <- read_csv("additional_data_used.csv")
+
+rank_data <- read_csv("ranked_measure_data_utilized.csv")
+```
+
+```{r}
+# library(tidyverse)
+# 
+# file_names <- str_c("excel_files", list.files("excel_files/"), sep = "/")
+# 
+# tab_names <- lapply(file_names, function(x) excel_sheets(path = x))
+# 
+# list_names <- lapply
+# 
+# 
+# # list_all <- lapply(file_names, function(x) {
+# #   lapply(tab_names, function(y) {read_excel(file = x, sheet = y)}))
+# # }
+# 
+# list_all <- map2(file_names, tab_names, read_excel(file = file_names, sheet = tab_names))
+# 
+# files <- lapply(file_names, function(y) read_excel(file = y))
+# 
+# # 
+# # tab_names <- lapply(tab_names, function(x) )
+# # 
+# # list_all <- lapply(tab_names, function(x) read_excel("Full Data.xls", sheet = x))
+# # years <- c(2011:2018)
+# # for (i in seq_along(years)) {
+# #   list_all[[i]]$year = years[i]
+# # }
+# 
+# 
+# 
+# 
+# ```
+# 
+# Read every spreadsheet every page. 
+# 
+# ```{r}
+# path <- "excel_files/2011 County Health Ranking Virginia Data - v4.xls"
+# 
+# 
+# file_names %>% 
+#   map(~excel_sheets(.x)) %>% 
+#   set_names() %>% 
+#   map(~read_excel, sheet = .x, 
+#       path = file_names)
+# 
+# read_multiple_excel <- function(path){
+#   path %>% 
+#   excel_sheets() %>% 
+#   set_names() %>% 
+#   map_df(read_excel, 
+#       path = path)
+# }
+# 
+# data <- file_names %>% 
+#   map(read_multiple_excel)
+#     
+# 
+# ```
+# 
+# ```{r}
+# library(tidyverse)
+# library(readxl)
+# library(rio)
+# library(janitor)
+# 
+# file_names <- str_c("excel_files", list.files("excel_files/"), sep = "/")
+# 
+# tab_names <- lapply(file_names, function(x) excel_sheets(path = x))
+# 
+# tab_names[1] %>% 
+#   map(~str_subset(. ,".Data$")) %>% 
+#   set_names() 
+# 
+# data_list <- map(file_names, import_list) %>% 
+#   set_names(str_extract(file_names, "20..")) 
+# 
+# data_list$`2020`$`Ranked Measure Data` %>% 
+#   unname() %>% 
+#   row_to_names(1) %>% 
+#   clean_names() %>% 
+#   glimpse()
+# 
+# 
+#   
+# data_list %>% 
+#   map_df("Ranked Measure Data") %>% 
+#   unname() %>% 
+#   row_to_names(1) %>% 
+#   clean_names() %>% 
+#   glimpse()
+#   # names() -> col_names
+#   
+#  col_names %>% 
+#    str_count("na_.") 
+#   
+#  # map(df, ) 
+# # df[[1]]$`Ranked Measure Data`
+# ```
+# 
+# ```{r}
+# files <- str_c("excel_files", list.files("excel_files/"), sep = "/")
+# 
+# map_df(set_names(files), function(file) {
+#   file %>% 
+#     excel_sheets() %>% 
+#     set_names() %>% 
+#     map_df(~ read_excel(path = file, sheet = .x), 
+#            .id = "sheet")
+# },
+# .id = "file")
+# 
+# all_sheets <- 
+# files %>% 
+#   map(excel_sheets)
+# 
+# sheets <- c(all_sheets[[1]][[4]], all_sheets[[1]][[5]])
+# 
+# sheets %>% 
+#   set_names()
+# 
+# files %>% 
+#   map(~read_excel(path = .x, sheet = all_sheets[[1]][[4]]))
+
+```
+
+
+### Final Data Read ranked measure data
+
+```{r}
+
+
+files <- str_c("excel_files", list.files("excel_files/"), sep = "/")
+
+all_sheets <- 
+files %>% 
+  map(excel_sheets)
+
+sheets <- c(all_sheets[[1]][[4]], all_sheets[[1]][[5]])
+
+ranked_measure_data_list <- 
+  files %>% 
+  map(~read_excel(path = .x, sheet = sheets[1])) %>% 
+    set_names(str_extract(files, "20..")) %>% 
+      map(~ unname(.x)) %>% 
+      map(~ row_to_names(.x, row_number = 1)) %>% 
+      map(~ clean_names(.x)) %>% 
+   map(~ select(.x , 
+               -starts_with(c("x95", "x20", "x80", "z_score", "unrel", "sample_size", 
+                              "under", "pop", "pcp_r")), 
+               -ends_with(c("low", "high", "_2")),
+               -state))
+
+years <- c(2011:2020)
+for (i in seq_along(years)) {
+  ranked_measure_data_list[[i]]$year = years[i]
+}
+
+ranked_measure_data <- 
+ranked_measure_data_list %>% 
+  bind_rows() %>% 
+  filter(!is.na(fips)) %>% 
+  select(-aggregate_population) %>% 
+  hablar::retype() %>% 
+  select(1:2, year, everything())
+
+## Use hablar to change types
+
+rm(ranked_measure_data_list, sheets, i, years, all_sheets, files)
+
+ranked_measure_data %>%
+  group_by(year) %>% 
+  glimpse()
+
+
+write_csv(ranked_measure_data, "ranked_measure_data.csv")
+
+```
+
+### Read data
+```{r}
+data <- read_csv("ranked_measure_data.csv")
+```
+
+### Find variables with more than 1300 NAs
+
+```{r}
+data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:190), "var_name") %>% 
+  filter(value >= 1300) %>% 
+  pull(var_name) ->
+  unusable_variables
+  
+```
+
+### Remove unusuable variables and filter again
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:131), "var_name") %>% 
+  filter(value >= 1000) %>% 
+  filter(str_detect(var_name,"black")) %>% 
+  pull(var_name) %>% 
+  c(.,unusable_variables) ->
+  unusable_variables
+  
+```
+
+remove commute variables
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:124), "var_name") %>% 
+  arrange(var_name) %>% 
+  filter(str_detect(var_name, c("commute", "drive"))) %>% 
+  pull(var_name) %>% 
+  c(., unusable_variables) -> 
+  unusable_variables
+```
+remove drive variables
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:119), "var_name") %>% 
+  filter(str_detect(var_name, "drive")) %>% 
+  pull(var_name) %>% 
+  c(., unusable_variables) -> 
+  unusable_variables
+```
+
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:116), "var_name") %>% 
+  filter(str_detect(var_name, c("black", "hispanic"))) %>% 
+  pull(var_name) %>% 
+  c(., unusable_variables) -> 
+  unusable_variables
+```
+
+```{r}
+unusable_variables <- 
+  unusable_variables %>% 
+  c(., c("chlamydia_rate", "teen_birth_rate", "pcp_rate", "dentist_rate", "mhp_rate",
+         "association_rate","violent_crime_rate", "injury_death_rate", "rates_per_100000",
+         "homicide_rate", "mv_mortality_rate"))
+```
+
+
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:114), "var_name") %>% 
+  filter(str_detect(var_name, paste(c("chlamydia_rate", "teen_birth_rate", "pcp_rate", "dentist_rate",
+                                      "mhp_rate", "association_rate","violent_crime_rate",
+                                      "injury_death_rate", "rates_per_100000",
+                                      "homicide_rate", "mv_mortality_rate"),
+                                    collapse = "|")
+                    )
+         ) %>%
+pull(var_name) %>% 
+  c(., unusable_variables) -> 
+  unusable_variables
+```
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(c(1:104), "var_name") %>% 
+  arrange(desc(value))
+```
+
+
+rewrite data
+
+```{r}
+data %>% 
+  select(-unusable_variables) %>%
+  write_csv("ranked_measure_data.csv")
+```
+
+
+More cleaning
+
+```{r}
+data <- read_csv("ranked_measure_data.csv")
+```
+
+ypll_rate and years_of_,,, are the same variable with different names.
+
+```{r}
+data %>% 
+  filter(fips != 51000) %>% 
+  mutate(ypll_rate = c(ypll_rate[year < 2015], years_of_potential_life_lost_rate[year >= 2015])) %>% 
+  select(-years_of_potential_life_lost_rate, years_of_potential_life_lost_rate_white) ->
+  data
+```
+
+```{r}
+data %>% 
+  write_csv("ranked_measure_data.csv")
+```
+
+```{r}
+data <- read_csv("ranked_measure_data.csv")
+```
+
+```{r}
+data %>% 
+  # select(-unusable_variables) %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  arrange(desc(value))
+```
+
+```{r}
+data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  filter(str_detect(var_name,"limited"))
+```
+
+```{r}
+data %>% 
+  select(percent_lbw)
+```
+
+```{r}
+data %<>% 
+  select(-c(lbw_births, percent_lbw_hispanic, percent_lbw_white)) 
+```
+
+```{r}
+data %<>% 
+  rename(sti_cases = cases)
+```
+
+
+```{r}
+data %>% 
+  write_csv("ranked_measure_data_utilized.csv")
+```
+
+
+### Variables 
+
+find duplicate variables
+
+```{r}
+var_names <- 
+ranked_measure_data %>% 
+  names()
+
+var_names %>% 
+  sort()
+
+var_names[str_detect(var_names, "death")]
+```
+
+
+
+
+```{r}
+  
+  
+# ranked_measure_data %>% 
+#   select(-starts_with(c("under", "pop", "pcp_r")),
+#          -ends_with("_2"),
+#          -c("violent_crimes", "psed_num", "aggregate_population")) %>% 
+  
+# # Find unnecessary variable names.  Applied above.
+# variable_names_list <- 
+# ranked_measure_data_list %>% 
+#   map(~ select(.x , 
+#                -starts_with(c("x95", "x20", "x80", "z_score", "unrel", "sample_size")), 
+#                -ends_with(c("low", "high")),
+#                -state)) %>% 
+#   map(~ colnames(.x))
+# 
+# duplicate_variable_locations <- 
+#   c(variable_names_list %>% 
+#       map(~ str_sort(.x)) %>% 
+#       unlist() %>% 
+#       stringi::stri_duplicated()) %>% 
+#   which(duplicate_variable_locations == TRUE) 
+# 
+# 
+# var_names <- 
+# unlist(names, use.names = FALSE)[
+# which(
+# unlist(names, use.names = FALSE) %>% 
+#   stringi::stri_duplicated() == TRUE)] %>% 
+#   unique()
+# 
+# # ranked_measure_data_list %>% 
+# #   map(~ select(.x, var_names))
+# 
+# variable_names_list %>% 
+#   unlist(., use.names = FALSE) %>% 
+#   unique() %>% 
+#   str_sort()
+```
+
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(rio)
+library(janitor)
+library(stringi)
+library(magrittr)
+```
+
+
+```{r}
+data <- read_csv("ranked_measure_data_utilized.csv")
+```
+
+```{r}
+data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>% 
+  select(ends_with(c("white")), 
+         psed_num,
+         teen_population,
+         number_unemployed,
+         labor_force,
+         number_children_in_poverty,
+         number_dentists,
+         number_some_college,
+         number_alcohol_impaired_driving_deaths,
+         number_driving_deaths,
+         cohort_size,
+         number_households_with_severe_problems,
+         workers, 
+         income_ratio
+         ) %>% 
+  pivot_longer(everything(), "var_name") %>%
+  arrange(var_name) %>% 
+  pull(var_name) ->
+  remove_vars
+
+data %>% 
+  select(-remove_vars) %>% 
+  write_csv("ranked_measure_data_utilized.csv")
+```
+
+
+```{r}
+data %<>% 
+  mutate(number_diabetics = c(no_of_diabetics[year == 2011],
+           number_diabetics[year != 2011])) %>% 
+  select(-no_of_diabetics)
+```
+
+```{r}
+data %>% 
+  select(contains("pm"), year, county)
+
+data %<>% 
+  mutate(average_daily_pm25 = c(average_daily_pm25[year <= 2014], 
+                                average_daily_pm2_5[year > 2014])) %>% 
+  select(-average_daily_pm2_5)
+
+```
+
+
+```{r}
+data %<>% 
+  mutate(sti_cases = c(sti_cases[year < 2013],
+                             chlamydia_cases[year %in% c(2013, 2014)],
+                             number_chlamydia_cases[year >= 2015])) %>%
+  select(-contains("chlam"))
+
+write_csv(data,"ranked_measure_data_utilized.csv")  
+```
+
+
+```{r}
+data <- 
+  read_csv("ranked_measure_data_utilized.csv")
+```
+
+```{r}
+data %<>% 
+  select(-number_single_parent_households, -number_households, -number_household_with_severe_problems)
+```
+
+```{r}
+data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  arrange(desc(value))
+```
+
+
+### Final Data Additional Measure Data
+
+```{r}
+files <- str_c("excel_files", list.files("excel_files/"), sep = "/")
+
+all_sheets <- 
+files %>% 
+  map(excel_sheets)
+
+sheets <- c(all_sheets[[1]][[4]], all_sheets[[1]][[5]])
+
+years <- c(2011:2020)
+
+files %>% 
+  map(~read_excel(path = .x, sheet = sheets[2])) %>% 
+    set_names(str_extract(files, "20..")) %>% 
+      map(~ unname(.x)) %>% 
+      map(~ row_to_names(.x, row_number = 1)) %>% 
+      map(~ clean_names(.x)) %>% 
+   map(~ select(.x , 
+               -starts_with(c("x95", "x20", "x80", "z_score", "unrel", "sample_size")), 
+               -ends_with(c("low", "high")),
+               -state)
+               ) -> add_data
+
+for (i in seq_along(years)) {
+  add_data[[i]]$year = years[i]
+}
+
+add_data %<>% 
+  bind_rows() %>% 
+  filter(!is.na(fips),
+         !is.na(county)) %>% 
+  hablar::retype() %>% 
+  select(1:2, year, everything())
+
+write_csv(add_data, "additional_data.csv")
+  
+```
+
+```{r}
+add_data <- read_csv("additional_data.csv")
+```
+
+```{r}
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  filter(value == 1336) %>% 
+  pull(var_name) ->
+  not_useful
+
+
+add_data %>% 
+  select(- not_useful) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data <- read_csv("additional_data_used.csv")
+
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>%
+  select(contains("pop")) %>% 
+  pivot_longer(everything(), "var_name")
+
+add_data %>% 
+  select(-contains("population_")) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data <- read_csv("additional_data_used.csv")
+
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>%
+  # select(contains("pop")) %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  arrange(var_name)
+```
+
+```{r}
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>%
+  select(contains(c("age_adjusted", "child", "drug", "firearm", "hiv",
+                    "homicide"))) %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  arrange(var_name) %>% 
+  pull(var_name) -> 
+  not_useful
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>%
+  pivot_longer(everything(), "var_name") %>% 
+  arrange(var_name)
+```
+
+
+```{r}
+add_data <- read_csv("additional_data_used.csv")
+
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>%
+  select(contains(c("dentist", "household_", "illiteracy", 
+                  "infant_", "liquor", "mph_", 
+                  "mortality_", "motor_vehicle"))) %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  pull(var_name) -> 
+  not_useful
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data <- read_csv("additional_data_used.csv")
+
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>%
+  select(contains("number"), -contains(c("food", "zip", "insured"))) %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  pull(var_name) ->
+  not_useful
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data <- read_csv("additional_data_used.csv")
+rank_data <- read_csv("ranked_measure_data_utilized.csv")
+
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  pivot_longer(everything(), "var_name")
+```
+
+```{r}
+rank_data %>% 
+  names()
+
+add_data %>% 
+  names()
+```
+
+```{r}
+add_data <- read_csv("additional_data_used.csv")
+rank_data <- read_csv("ranked_measure_data_utilized.csv")
+```
+
+```{r}
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble() %>% 
+  select(contains("death")) %>% 
+  pivot_longer(everything(), "var_name") %>% 
+  pull(var_name) ->
+  not_useful
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+number_na <- function(df){
+  df %>% 
+    map(~ sum(length(which(is.na(.x))))) %>% 
+    as_tibble %>% 
+    pivot_longer(everything(), "var_name") %>% 
+    arrange(desc(value))
+}
+
+number_na(add_data)
+number_na(rank_data)
+```
+
+```{r}
+add_data %>% 
+  select(contains("number")) %>% 
+  names() -> 
+  not_useful
+
+not_useful <- 
+  not_useful[-c(6, 9, 21)]
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+
+add_data <- read_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data %>% 
+  names()
+```
+
+```{r}
+not_useful <- c("households",
+"no_drive_alone",
+"workers",
+"costs",
+"percent_couldnt_access",
+"non_hispanic_white",
+"mhp_rate",
+"mhp_ratio",
+"percent_uninsured_2",
+"other_pcp_rate",
+"other_pcp_ratio",
+"other_pcp_rate_2",
+"other_pcp_ratio_2",
+"percent_18",
+"percent_65_and_over",
+"percent_african_american",
+"percent_american_indian_alaskan_native",
+"percent_native_hawaiian_other_pacific_islander",
+"percent_hispanic",
+"percent_non_hispanic_white",
+"percent_female",
+"percent_rural",
+"percent_disconnected_youth",
+"non_petitioned_cases")
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+
+add_data <- read_csv("additional_data_used.csv")
+```
+```{r}
+add_data %>% 
+  names() %>% 
+  str_extract("percent_.*") %>% 
+  sort()
+rank_data %>% 
+  names() %>% 
+  str_extract("percent_.*") %>% 
+  sort()
+```
+
+```{r}
+tibble(add_data$percent_uninsured, rank_data$percent_uninsured)
+```
+
+```{r}
+not_useful <- c("number_low_birthweight_births",
+"number_single_parent_households",
+"number_uninsured",
+"number_with_access",
+"number_workers")
+
+rank_data %>% 
+  select(-not_useful) %>% 
+  write_csv("ranked_measure_data_utilized.csv")
+```
+
+```{r}
+not_useful <- c("percent_binge_drinking", "percent_uninsured")
+
+add_data %>% 
+  select(-not_useful) %>% 
+  write_csv("additional_data_used.csv")
+```
+
+```{r}
+add_data %>% names()
+
+rank_data %>% names()
+```
+
+```{r}
+rank_data%>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>% 
+  select(contains("food")) %>% 
+  pivot_longer(everything(), "var_name") 
+    
+
+add_data %>% 
+  map(~ sum(length(which(is.na(.x))))) %>% 
+  as_tibble %>% 
+  select(contains("food")) %>% 
+  pivot_longer(everything(), "var_name") 
+```
+
+```{r}
+rank_data %>% 
+  select(county, year, contains("food")) %>% 
+  left_join(add_data %>% 
+              select(county, year, contains("food"))) 
+  
+```
+
+```{r}
+rank_data %>% 
+  select(county, year, contains("zip")) %>% 
+  left_join(add_data %>% 
+              select(county, year, contains("zip"))) 
+```
+
+```{r}
+rank_data %>% 
+  select(county, year, number_zip_codes) 
+
+add_data %>% 
+  select(county, year, number_zip_codes)
+  
+```
+
+```{r}
+add_data %>% 
+  left_join(rank_data, by = c("fips", "county", "year")) %>% 
+  write_csv("desert_data.csv")
+
+```
+
+```{r}
+data <- read_csv("desert_data.csv")
+```
+
+```{r}
+data %>% 
+  lm(percent_obese ~ percent_limited_access_to_healthy_foods, .) %>% 
+  summary()
+```
+
+
+```{r}
+
+```
+

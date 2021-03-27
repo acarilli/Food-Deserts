@@ -1,0 +1,33 @@
+---
+title: "social explorer"
+author: "Tony Carilli"
+date: "11/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Social Explorer Data 
+
+2019 data
+
+```{r}
+here::here("excel_files", "R12687961_SL050.csv") %>%
+  read_csv(skip = 1) %>%
+  # janitor::clean_names() %>%
+  # select(2:3, 5, ends_with("v1")) %>%
+  filter(Geo_STATE == 51) %>% 
+  lm(
+    ORG_RAW_HD2019_035_LB_v2 ~ 
+      ORG_RAW_HD2019_021_FI_v2 + 
+      ORG_RAW_HD2019_001_ATEO_v1 + ORG_RAW_HD2019_003_AS_v1 +
+      ORG_RAW_HD2019_008_CISH_v1 + ORG_RAW_HD2019_010_D_v5 + 
+      ORG_RAW_HD2019_010_D_v13,
+    .
+  ) %>%
+  summary()
+```
+
