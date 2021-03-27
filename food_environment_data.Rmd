@@ -1,0 +1,135 @@
+---
+title: "food_environment_data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lmtest)
+```
+
+```{r}
+read_excel_allsheets <-
+  function(filename, tibble = TRUE) {
+    sheets <- readxl::excel_sheets("food_environment.xls")
+    x <- lapply(sheets, function(X) readxl::read_excel(filename, sheet = X))
+    if(!tibble) x <- lapply(x, as.data.frame)
+    names(x) <- sheets
+    x
+  }
+```
+
+```{r}
+food_environment <- read_excel_allsheets("food_environment.xls")
+```
+
+```{r}
+food_data <- 
+  data.frame(food_environment$ACCESS$FIPS,
+             food_environment$ACCESS$County,
+             food_environment$ACCESS$State,
+             food_environment$ACCESS$LACCESS_POP10,
+             food_environment$ACCESS$LACCESS_POP15,
+             food_environment$STORES$GROC11,
+             food_environment$STORES$GROC16,
+             food_environment$STORES$SUPERC11,
+             food_environment$STORES$SUPERC16,
+             food_environment$STORES$CONVS11,
+             food_environment$STORES$CONVS16,
+             food_environment$STORES$SPECS11,
+             food_environment$STORES$SPECS16,
+             food_environment$STORES$SNAPS12,
+             food_environment$STORES$SNAPS17,
+             food_environment$STORES$WICS11,
+             food_environment$STORES$WICS16,
+             food_environment$RESTAURANTS$FFR11,
+             food_environment$RESTAURANTS$FFR16,
+             food_environment$RESTAURANTS$FSR11,
+             food_environment$RESTAURANTS$FSR16,
+             food_environment$RESTAURANTS$PC_FFRSALES07,
+             food_environment$RESTAURANTS$PC_FFRSALES12,
+             food_environment$RESTAURANTS$PC_FSRSALES07,
+             food_environment$RESTAURANTS$PC_FSRSALES12,
+             food_environment$ASSISTANCE$PCT_SNAP12,
+             food_environment$ASSISTANCE$PCT_SNAP17,
+             food_environment$ASSISTANCE$PCT_FREE_LUNCH10,
+             food_environment$ASSISTANCE$PCT_FREE_LUNCH15,
+             food_environment$ASSISTANCE$PCT_WIC12,
+             food_environment$ASSISTANCE$PCT_WIC17,
+             food_environment$ASSISTANCE$FOOD_BANKS18,
+             food_environment$INSECURITY$FOODINSEC_12_14,
+             food_environment$INSECURITY$FOODINSEC_15_17,
+             # food_environment$LOCAL$FMRKT_SNAP18, 
+             # food_environment$LOCAL$FMRKT_WIC18,
+             # food_environment$LOCAL$VEG_FARMS07,
+             # food_environment$LOCAL$VEG_FARMS12,
+             # food_environment$LOCAL$ORCHARD_ACRES07,
+             # food_environment$LOCAL$ORCHARD_ACRES12,
+             # food_environment$LOCAL$BERRY_ACRES07,
+             # food_environment$LOCAL$BERRY_ACRES12,
+             food_environment$HEALTH$PCT_DIABETES_ADULTS08,
+             food_environment$HEALTH$PCT_DIABETES_ADULTS13,
+             food_environment$HEALTH$PCT_OBESE_ADULTS12,
+             food_environment$HEALTH$PCT_OBESE_ADULTS17,
+             food_environment$HEALTH$RECFAC11,
+             food_environment$HEALTH$RECFAC16,
+             food_environment$SOCIOECONOMIC$PCT_NHWHITE10,
+             food_environment$SOCIOECONOMIC$PCT_NHBLACK10,
+             food_environment$SOCIOECONOMIC$PCT_HISP10,
+             food_environment$SOCIOECONOMIC$PCT_NHASIAN10,
+             food_environment$SOCIOECONOMIC$PCT_65OLDER10,
+             food_environment$SOCIOECONOMIC$PCT_18YOUNGER10)
+```
+
+```{r}
+va_food_data <- 
+  food_data %>% 
+  rename(fips = 1,
+         county = 2, 
+         state = 3,
+         limited_access_10 = 4,
+         limited_access_15 = 5,
+         groc_store_11 = 6,
+         groc_store_16 = 7,
+         super_mkt_11 = 8,
+         super_mkt_16 = 9,
+         conv_store_11 = 10,
+         conv_store_16 = 11, 
+         spec_store_11 = 12,
+         spec_store_16 = 13,
+         snap_store_12 = 14, 
+         snap_store_17 = 15,
+         wic_store_11 = 16,
+         wic_store_16 = 17,
+         fast_food_11 = 18,
+         fast_food_16 = 19,
+         full_service_11 = 20,
+         full_service_16 = 21,
+         ff_expenditures_per_capita_07 = 22,
+         ff_expenditures_per_capita_12 = 23,
+         fs_expenditures_per_capita_07 = 24, 
+         fs_expenditures_per_capita_12 = 25,
+         pct_snap_12 = 26, 
+         pct_snap_17 = 27,
+         pct_free_lunch_10 = 28,
+         pct_free_lunch_15 = 29,
+         pct_wic_12 = 30, 
+         pct_wic_17 = 31,
+         food_banks_18 = 32,
+         insecurity_12_14 = 33,
+         insecurity_14_17 = 34,
+         pct_diabetes_08 = 35, 
+         pct_diabetes_13 = 36,
+         pct_obese_12 = 37,
+         pct_obese_17 = 38,
+         recreation_fitness_11 = 39,
+         recreation_fitness_16 = 40,
+         white_10 = 41, 
+         black_10 = 42, 
+         hisp_10 = 43, 
+         asian_10 = 44,
+         pct_65_older_10 = 45,
+         pct_18_younger_10 = 46) %>% 
+  filter(state == "VA")
+```
