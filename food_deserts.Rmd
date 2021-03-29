@@ -18,8 +18,9 @@ library(AER)
 ```
 
 ```{r}
-food_desert <- read_csv("colorectal_data.csv") %>% 
+food_desert <- read_csv("colorectal_data.csv") %>%
   mutate(median_household_income = median_household_income / 1000)
+
 ```
 
 ## EDA
@@ -129,3 +130,32 @@ food_desert %>%
         factor(county), index = "county", model = "within", effect = "twoways", .) %>% 
   summary()
 ```
+
+```{r iv}
+food_desert %>%
+  filter(year > 2011) %>%
+  plm(
+    diabetes ~ access_to_healthy_foods + adult_obesity |
+    physical_inactivity + access_to_healthy_foods +
+    pop_over_65 + median_household_income +
+    access_to_recreational_facilities + adult_smoking + excessive_drinking,
+    index = "county",
+    model = "within",
+    effect = "twoways",
+    .
+  ) %>%
+  summary()
+```
+
+```{r}
+food_desert %>%
+  filter(year > 2011) %>%
+  lm(
+    adult_obesity ~ physical_inactivity +
+      pop_over_65 + median_household_income + access_to_healthy_foods +
+      access_to_recreational_facilities + adult_smoking + excessive_drinking,
+    .
+  ) %>%
+  summary()
+```
+
