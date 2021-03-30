@@ -23,66 +23,6 @@ food_desert <- read_csv("colorectal_data.csv") %>%
 
 ```
 
-## EDA
-
-```{r}
-food_desert %>% 
-  select(county, population, pop_over_65) %>% 
-  arrange(desc(population))
-```
-
-
-```{r}
-food_desert %>% 
-  ggplot(aes(x = physical_inactivity, y = diabetes, color = (population > 100000))) +
-  geom_point(na.rm = TRUE, alpha = 0.4)
-```
-
-```{r}
-food_desert %>% 
-  group_by(year) %>% 
-  summarize(max(access_to_healthy_foods, na.rm = TRUE),
-            min(access_to_healthy_foods, na.rm = TRUE),
-            median(access_to_healthy_foods, na.rm = TRUE))
-  # ggplot(aes(x = access_to_healthy_foods)) + 
-  # geom_histogram() + 
-  # facet_grid(~ year)
- 
-```
-
-
-```{r}
-food_desert %>% 
-  # filter(year > 2012) %>% 
-  ggplot(aes(x = adult_obesity)) +
-  geom_histogram() + 
-  facet_grid(~year)
-```
-
-```{r}
-food_desert %>% 
-  # filter(year > 2012) %>% 
-  ggplot(aes(y = adult_obesity, group = year, x  = year)) + 
-  geom_boxplot()
-
-food_desert %>% 
-  group_by(year) %>% 
-  summarize(median(adult_obesity))
-```
-
-```{r}
-all.equal(
-food_desert %>% 
-  filter(year == 2012) %>% 
-  select(adult_obesity) 
-,
-food_desert %>% 
-  filter(year == 2013) %>% 
-  select(adult_obesity)
-)
-```
-
-
 
 ## Diabetes
 
@@ -102,35 +42,23 @@ food_desert %>%
 You can also embed plots, for example:
 
 ```{r obesity}
-food_desert %>% 
-  filter(year > 2011) %>% 
-  plm(adult_obesity ~ physical_inactivity + 
-        pop_over_65 + median_household_income + access_to_healthy_foods +
-        access_to_recreational_facilities + adult_smoking + excessive_drinking + 
-        factor(year), index = "county", model = "within", effect = "twoways", .) %>% 
-  # fixef() %>% 
+food_desert %>%
+  filter(year > 2011) %>%
+  plm(
+    adult_obesity ~ access_to_healthy_foods + physical_inactivity +
+      pop_over_65 + median_household_income +
+      access_to_recreational_facilities + adult_smoking + excessive_drinking +
+      factor(year),
+    index = "county",
+    model = "within",
+    effect = "twoways",
+    .
+  ) %>%
+  
   summary()
 ```
 
-```{r, diabetes_18_65}
-food_desert %>% 
-  filter(year > 2011) %>%
-  plm(diabetes ~ physical_inactivity + 
-        pop_between_18_and_65 + median_household_income + access_to_healthy_foods +
-        access_to_recreational_facilities + adult_smoking + excessive_drinking + adult_obesity + 
-        factor(county), index = "county", model = "within", effect = "twoways", .) %>% 
-  summary()
-```
-
-```{r, diabetes_under_18}
-food_desert %>% 
-  filter(year > 2011) %>%
-  plm(diabetes ~ physical_inactivity + 
-        pop_under_18 + median_household_income + access_to_healthy_foods +
-        access_to_recreational_facilities + adult_smoking + excessive_drinking + adult_obesity + 
-        factor(county), index = "county", model = "within", effect = "twoways", .) %>% 
-  summary()
-```
+## IV
 
 ```{r iv}
 food_desert %>%
