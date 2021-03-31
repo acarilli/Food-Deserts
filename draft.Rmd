@@ -1,0 +1,26 @@
+---
+title: "Food Deserts in Virginia?"
+output: html_document
+bibliography: 
+abstract:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Food deserts (FDs) are often defined as urban areas with extremely limited or no access to healthy food options; affordability is also a relevant defining characteristic. When people live in food deserts, evidence suggests they are more likely to have poor diets and are more likely to be obese. This is especially likely, perhaps, when ‘mom and pop’ convenience stores and liquor stores are the primary food retailers. See, for example, “Life in a ‘Food Desert’” (Whelan et al., 2002) on FDs in London; and "Beyond the Food Desert” (Battersby, 2016) on food insecurity in South Africa). In efforts to eliminate food deserts, public health advocates and policymakers have allocated public monies to encourage grocery stores to relocate, they have built farmers markets, and even virtual grocery stores. Weatherspoon, et al. (2012) measure the price elasticity of fruit in food deserts, which suggests consumers are price sensitive and suggest policies to lower prices, e.g., encourage competition. Walker et al. (2010) review the literature on food deserts and show that most scholars focus on access to healthy foods, the racial component of food deserts (i.e., that most food deserts are within predominantly black neighborhoods), most food deserts are within poorer neighborhoods, and that most food retailers in food deserts are non-chain stores and typically charge higher prices.
+
+However, the metaphor of a literal food desert is fraught with definitional challenges (Caspi, et al., 2012) and might be inappropriate. What is considered healthy food; what does access mean; what is the relevant size of a neighborhood, etc.? Widener (2018) suggests the metaphor over emphasizes distance to supermarkets as a causal factor on health outcomes and should be retired. Indeed, Dubowitz et al. (2015), in “Healthy Food Access for Urban Food Desert Residents” and Dubowitz  et al. (2014) show that mere distance to healthy food options does not necessarily influence eating habits, especially in the context of two urban, african american communities in Pittsburgh. That is, while there were no supermarkets with healthy options in those neighborhoods, people travelled outside their neighborhoods to shop.
+
+In light of these arguments, we analyze the relationship between access to healthy food and health outcomes like obesity and diabetes across counties in the state of Virginia between 2011 and 2015. Advocates of the food desert concept postulate access has a negative effect on these health outcomes However, we find no relationship between these two variables after accounting for median household income, access to recreational facilities, etc. 
+
+Our results support earlier studies that show food deserts are not as burdensome as advocates and policymakers make them out to be. This is especially because, in VA, people have access to supermarkets within and without their counties. At the same time, while we find no relationship between access and obesity at the county level, this does not preclude the existence of food deserts. They might still exist within a neighborhood, but our results challenge naive conclusions regarding food deserts and negative health outcomes like obesity.
+
+# Data and Methods
+
+# Results
+
+# Discussion and Conclusion
