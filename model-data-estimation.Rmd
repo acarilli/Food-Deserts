@@ -15,6 +15,7 @@ library(plm)
 library(broom)
 library(jtools)
 library(AER)
+library(modelsummary)
 ```
 
 ```{r data, include=FALSE}
@@ -131,29 +132,17 @@ We cannot reject $H_0:\delta=0$. Lack of access to healthy food options does not
 
 # Appendix: Desriptive Statistics
 
-```{r}
-food_desert %>% 
-  group_by(county) %>% 
-  # summarize(mean(diabetes, na.rm = TRUE),
-  #           sd(diabetes, na.rm = TRUE))
-  ggplot(aes(x = county, y = diabetes)) + 
-  geom_boxplot(na.rm = TRUE) +
-  labs(x = NULL) + 
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()) 
-```
 
-```{r}
+```{r desc-stats, message=FALSE, results='asis'}
 food_desert %>% 
   select(diabetes, access_to_healthy_foods, adult_obesity, physical_inactivity, 
       pop_over_65,  median_household_income, access_to_recreational_facilities,
       adult_smoking, excessive_drinking, adult_obesity) %>% 
-  summarytools::descr()
-
-food_desert %>% 
-  select(diabetes, access_to_healthy_foods, adult_obesity, physical_inactivity, 
-      pop_over_65,  median_household_income, access_to_recreational_facilities,
-      adult_smoking, excessive_drinking, adult_obesity) %>% 
-  modelsummary::datasummary_df()
+  summarytools::descr(
+    stats = c("mean", "sd", "min", "med", "max", "n.valid"), 
+    transpose = TRUE,
+    style = "rmarkdown",
+    headings = FALSE
+  )
 ```
 
