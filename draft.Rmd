@@ -13,6 +13,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Food deserts (FDs) are often defined as urban areas with extremely limited or no access to healthy food options; affordability is also a relevant defining characteristic.^[The idea of FDs developed in the United Kingdom to describe the lack of food shopping for residents near newly-built, isolated public housing units (New York Law School Racial Justice Project, 2012).] Walker et al. (2010) reviews the literature on food deserts and show that most scholars define food deserts in terms of access to healthy foods, the racial component of food deserts (i.e., that most food deserts are within predominantly black neighborhoods), the income gradient (i.e., most food deserts are within poorer neighborhoods), and that most food retailers in food deserts are non-chain stores and typically charge higher prices. 
 
+```{r echo=FALSE}
+gtrendsR::gtrends(keyword = "food desert",
+                  geo = "US",
+                  time = "all", 
+                  onlyInterest = TRUE) %>% 
+  data.frame() %>% 
+  rename(date = interest_over_time.date, 
+         hits = interest_over_time.hits) %>% 
+  mutate(roll = zoo::rollmean(hits, 
+                              12, 
+                              fill = NA)) %>% 
+  ggplot(aes(x = date, y = roll)) +
+  geom_line() +
+  labs(title = "Yearly Average of Interest in Food Deserts",
+       x = NULL,
+       y = "Google Trends Index") +
+  theme(text = element_text(family = "Times New Roman"))
+```
+
+
 When people live in food deserts, evidence suggests they are more likely to have poor diets and are more likely to be obese. This is especially when ‘mom and pop’ convenience stores and liquor stores are the primary food retailers. See, for example, “Life in a ‘Food Desert’” (Whelan et al., 2002) on FDs in London; and "Beyond the Food Desert” (Battersby, 2016) on food insecurity in South Africa). Weatherspoon, et al. (2012) measures the price elasticity of fruit in food deserts, which suggests consumers are price sensitive and suggest policies to lower prices, e.g., encourage competition. In efforts to eliminate food deserts, public health advocates and policymakers allocate public monies to encourage grocery stores to relocate, and they build farmers markets and virtual grocery stores. 
 
 However, the metaphor of a food desert and even its existence depends on its definition and interpretation (Caspi, et al., 2012). For example, the US government defines the problem in terms of the lack of access to healthy foods, which they define as a town with at least 500 people who live over a mile from a supermarket. What is considered healthy food; what does access mean; what is the relevant size of a neighborhood, etc.? Bitler and Haider (2010) develop an economic approach to food deserts and also express similar concerns. Indeed, are food deserts such a burden when people can acquire food near their homes, at work, at schools, etc. (Bitler and Haider, 2010). Widener (2018) suggests the metaphor over emphasizes distance to supermarkets as a causal factor on health outcomes and should be retired. Indeed, Dubowitz et al. (2015), in “Healthy Food Access for Urban Food Desert Residents” and Dubowitz  et al. (2014) show that mere distance to healthy food options does not necessarily influence eating habits, especially in the context of two urban, african american communities in Pittsburgh. That is, while there were no supermarkets with healthy options in those neighborhoods, people traveled outside their neighborhoods to shop. Black and Macinko (2008) review the literature and find no consistent evdience on the relationship between access to healthy foods and obesity. Lee (2012) suggests that access to health or unhealthy food does not influence childhood obesity. 
