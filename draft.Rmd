@@ -7,13 +7,15 @@ abstract: We examine the existence of food deserts in Virginia at the county lev
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(gtrendsR)
 ```
 
 # Introduction
 
 Food deserts (FDs) are often defined as urban areas with extremely limited or no access to healthy food options; affordability is also a relevant defining characteristic.^[The idea of FDs developed in the United Kingdom to describe the lack of food shopping for residents near newly-built, isolated public housing units (New York Law School Racial Justice Project, 2012).] Walker et al. (2010) reviews the literature on food deserts and show that most scholars define food deserts in terms of access to healthy foods, the racial component of food deserts (i.e., that most food deserts are within predominantly black neighborhoods), the income gradient (i.e., most food deserts are within poorer neighborhoods), and that most food retailers in food deserts are non-chain stores and typically charge higher prices. 
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 gtrendsR::gtrends(keyword = "food desert",
                   geo = "US",
                   time = "all", 
@@ -29,7 +31,8 @@ gtrendsR::gtrends(keyword = "food desert",
   labs(title = "Yearly Average of Interest in Food Deserts",
        x = NULL,
        y = "Google Trends Index") +
-  theme(text = element_text(family = "Times New Roman"))
+  theme(text = element_text(family = "Times New Roman")) +
+  theme_classic()
 ```
 
 
