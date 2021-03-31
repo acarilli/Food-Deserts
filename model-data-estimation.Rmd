@@ -1,7 +1,7 @@
 ---
 title: "Food Deserts"
-author: "Carilli"
-date: "3/19/2020"
+author: "Carson Carilli"
+date: '`r format(lubridate::today(), "%B %Y")`'
 output: html_document
 ---
 
@@ -23,6 +23,7 @@ food_desert <- read_csv("colorectal_data.csv") %>%
 
 ```
 
+# Data, Model, Results
 
 To test the hypothesis that living in a food desert leads to adverse health outcomes we specify the following instrumental variable panel model where $HealthOutcome$ is the percent of adults with diabetes; $HealthyFoodAccess$ is the percent of the population without access to healthy food options, and $AdultObesity$ is the percent of adults with reported BMI in excess of 30. 
 
@@ -49,7 +50,7 @@ Were adult obesity is instrumented by
 \tag{2}
 \end{equation}
 
-The data for our empirical analysis comes from County Health Rankings & Roadmaps (@).  We have data for all counties in Virginia from 2011 to 2018.  
+The data for our empirical analysis comes from County Health Rankings & Roadmaps (@).  We have annual data for all counties in Virginia from 2011 to 2018.  
 
 We estimate equation (1) as:
 
@@ -92,7 +93,7 @@ food_desert %>%
  
 ```
 
-While we can reject $H_0: \gamma_1=\dotsm=\gamma_8$, the *F-statistic* is less than 10 suggesting weak instruments.  According we will estimate equation (1) a panel model with controls and IV panel model.  
+While we can reject $H_0: \gamma_1=\dotsm=\gamma_8=0$, the *F-statistic* is less than 10 suggesting weak instruments.  According we will estimate equation (1) a panel model with controls and IV panel model.  
 
 So, we estimate equation (3)
 
@@ -127,3 +128,32 @@ food_desert %>%
 ```
 
 We cannot reject $H_0:\delta=0$. Lack of access to healthy food options does not seem to affect the health outcome of adult diabetes. 
+
+# Appendix: Desriptive Statistics
+
+```{r}
+food_desert %>% 
+  group_by(county) %>% 
+  # summarize(mean(diabetes, na.rm = TRUE),
+  #           sd(diabetes, na.rm = TRUE))
+  ggplot(aes(x = county, y = diabetes)) + 
+  geom_boxplot(na.rm = TRUE) +
+  labs(x = NULL) + 
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) 
+```
+
+```{r}
+food_desert %>% 
+  select(diabetes, access_to_healthy_foods, adult_obesity, physical_inactivity, 
+      pop_over_65,  median_household_income, access_to_recreational_facilities,
+      adult_smoking, excessive_drinking, adult_obesity) %>% 
+  summarytools::descr()
+
+food_desert %>% 
+  select(diabetes, access_to_healthy_foods, adult_obesity, physical_inactivity, 
+      pop_over_65,  median_household_income, access_to_recreational_facilities,
+      adult_smoking, excessive_drinking, adult_obesity) %>% 
+  modelsummary::datasummary_df()
+```
+
