@@ -9,7 +9,7 @@ abstract: We examine the existence of food deserts in Virginia at the county lev
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. Introduction
+# Introduction
 
 Food deserts (FDs) are often defined as urban areas with extremely limited or no access to healthy food options; affordability is also a relevant defining characteristic.^[The idea of FDs developed in the United Kingdom to describe the lack of food shopping for residents near newly-built, isolated public housing units (New York Law School Racial Justice Project, 2012).] Walker et al. (2010) reviews the literature on food deserts and show that most scholars define food deserts in terms of access to healthy foods, the racial component of food deserts (i.e., that most food deserts are within predominantly black neighborhoods), the income gradient (i.e., most food deserts are within poorer neighborhoods), and that most food retailers in food deserts are non-chain stores and typically charge higher prices. 
 
@@ -25,6 +25,6 @@ In light of these arguments, we analyze the relationship between access to healt
 
 # Discussion and Conclusion
 
-Our results suggest arguments related to food deserts are overstated. That is, there is not statistical relationship between access to healthy foods and adverse health outcomes like obesity and diabetes. One reason for these results might simply be that while people live in counties with less access to healthy foods, they adjust their shopping habits to acquire their desired food bundle. To the extent there are widely-used substitutes for healthy eating that are not measured with our measures of grocery stores, e.g., cross-county shopping, delivery services, people might still be able to maintain a healthy lifestyle, they can avoid obesity and diabetes, regardless of whether there is a food desert. At the same time, such substitutes might be lacking, which limits general conclusions. 
+Our results suggest arguments related to food deserts are overstated. That is, there is no statistical relationship between access to healthy foods and adverse health outcomes like obesity and diabetes. One reason for these results might simply be that while people live in counties with less access to healthy foods, they adjust their shopping habits to acquire their desired food bundle. To the extent there are widely-used substitutes for healthy eating that are not measured with our measures of grocery stores, e.g., cross-county shopping, delivery services, people might still be able to maintain a healthy lifestyle, they can avoid obesity and diabetes, regardless of whether there is a food desert. At the same time, such substitutes might be lacking, which limits general conclusions. 
 
 Our data from Virginia covers counties with various demographic characteristics; while we suggest these results are not biased by being from Virginia, we do not show this. In future research we plan to extend our model to other states, e.g., states with different levels of median income, demographics, and institutions to examine the validity of our model. For example, a comparison of our results in Virginia with results from other southern states might make the argument stronger. 
