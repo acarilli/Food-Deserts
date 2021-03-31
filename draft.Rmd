@@ -174,4 +174,3 @@ food_desert %>%
     headings = FALSE
   )
 ```
-
