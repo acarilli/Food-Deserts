@@ -2,7 +2,7 @@
 title: "Food Deserts in Virginia?"
 output: html_document
 bibliography: 
-abstract: We examine the existence of food deserts in Virginia at the county level from 2011 to 2018, and find little evidence that access to healthy food influences health outcomes like obesity and diabetes.
+abstract: We examine the existence of food deserts in Virginia at the county level from 2011 to 2018, and find little evidence that access to healthy food influences health outcomes like diabetes.
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +20,9 @@ food_desert <- read_csv("colorectal_data.csv") %>%
 
 # Introduction
 
-Food deserts (FDs) are often defined as urban areas with extremely limited or no access to healthy food options; affordability is also a relevant defining characteristic.^[The idea of FDs developed in the United Kingdom to describe the lack of food shopping for residents near newly-built, isolated public housing units (New York Law School Racial Justice Project, 2012).] Walker et al. (2010) reviews the literature on food deserts and show that most scholars define food deserts in terms of access to healthy foods, the racial component of food deserts (i.e., that most food deserts are within predominantly black neighborhoods), the income gradient (i.e., most food deserts are within poorer neighborhoods), and that most food retailers in food deserts are non-chain stores and typically charge higher prices. 
+Food deserts (FDs) are often defined as urban areas with extremely limited or no access to healthy food options; affordability is also a relevant defining characteristic.[^1] Walker et al. (2010) reviews the literature on food deserts and show that most scholars define food deserts in terms of access to healthy foods, the racial component of food deserts (i.e., that most food deserts are within predominantly black neighborhoods), the income gradient (i.e., most food deserts are within poorer neighborhoods), and that most food retailers in food deserts are non-chain stores and typically charge higher prices. Figure 1 shows interest in food deserts from Google Trends.
+
+[^1]: The idea of FDs developed in the United Kingdom to describe the lack of food shopping for residents near newly-built, isolated public housing units (New York Law School Racial Justice Project, 2012).
 
 ```{r echo=FALSE, warning=FALSE}
 gtrendsR::gtrends(keyword = "food desert",
@@ -34,25 +36,30 @@ gtrendsR::gtrends(keyword = "food desert",
                               12, 
                               fill = NA)) %>% 
   ggplot(aes(x = date, y = roll)) +
-  geom_line() +
+  geom_line(size = .75) +
   labs(title = "Figure 1. Interest in Food Deserts",
        x = NULL,
-       y = "Google Trends Index",
-       caption = "12 month rolling average") +
-  theme(text = element_text(family = "Times New Roman")) +
-  theme_classic()
+       y = "Google Trends Index (12-month rolling average)",
+       caption = "Source: Google Trends") +
+  theme_classic() +
+  theme(text = element_text(family = "Times New Roman"),
+        plot.title = element_text(hjust = 0),
+        plot.title.position = 'plot',
+        plot.margin = margin(15, 15, 10, 15)) +
+  coord_cartesian(expand = FALSE)
 ```
 
-When people live in food deserts, evidence suggests they are more likely to have poor diets and are more likely to be obese. This is especially when ‘mom and pop’ convenience stores and liquor stores are the primary food retailers. See, for example, “Life in a ‘Food Desert’” (Whelan et al., 2002) on FDs in London; and "Beyond the Food Desert” (Battersby, 2016) on food insecurity in South Africa). Weatherspoon, et al. (2012) measures the price elasticity of fruit in food deserts, which suggests consumers are price sensitive and suggest policies to lower prices, e.g., encourage competition. In efforts to eliminate food deserts, public health advocates and policymakers allocate public monies to encourage grocery stores to relocate, and they build farmers markets and virtual grocery stores. 
+When people live in food deserts, evidence suggests they are more likely to have poor diets and are more likely to be obese. This is especially when 'mom and pop' convenience stores and liquor stores are the primary food retailers. See, for example, "Life in a 'Food Desert'" (Whelan et al., 2002) on FDs in London; and "Beyond the Food Desert" (Battersby, 2016) on food insecurity in South Africa). Weatherspoon, et al. (2012) measures the price elasticity of fruit in food deserts, which suggests consumers are price sensitive and suggest policies to lower prices, e.g., encourage competition. In efforts to eliminate food deserts, public health advocates and policymakers allocate public monies to encourage grocery stores to relocate, and they build farmers markets and virtual grocery stores.
 
-However, the metaphor of a food desert and even its existence depends on its definition and interpretation (Caspi, et al., 2012). For example, the US government defines the problem in terms of the lack of access to healthy foods, which they define as a town with at least 500 people who live over a mile from a supermarket. What is considered healthy food; what does access mean; what is the relevant size of a neighborhood, etc.? Bitler and Haider (2010) develop an economic approach to food deserts and also express similar concerns. Indeed, are food deserts such a burden when people can acquire food near their homes, at work, at schools, etc. (Bitler and Haider, 2010). Widener (2018) suggests the metaphor over emphasizes distance to supermarkets as a causal factor on health outcomes and should be retired. Indeed, Dubowitz et al. (2015), in “Healthy Food Access for Urban Food Desert Residents” and Dubowitz  et al. (2014) show that mere distance to healthy food options does not necessarily influence eating habits, especially in the context of two urban, african american communities in Pittsburgh. That is, while there were no supermarkets with healthy options in those neighborhoods, people traveled outside their neighborhoods to shop. Black and Macinko (2008) review the literature and find no consistent evdience on the relationship between access to healthy foods and obesity. Lee (2012) suggests that access to health or unhealthy food does not influence childhood obesity. 
+However, the metaphor of a food desert and even its existence depends on its definition and interpretation (Caspi, et al., 2012). For example, the US government defines the problem in terms of the lack of access to healthy foods, which they define as a town with at least 500 people who live over a mile from a supermarket. What is considered healthy food; what does access mean; what is the relevant size of a neighborhood, etc.? Bitler and Haider (2010) develop an economic approach to food deserts and also express similar concerns. Indeed, are food deserts such a burden when people can acquire food near their homes, at work, at schools, etc. (Bitler and Haider, 2010). Widener (2018) suggests the metaphor over emphasizes distance to supermarkets as a causal factor on health outcomes and should be retired. Indeed, Dubowitz et al. (2015), in "Healthy Food Access for Urban Food Desert Residents" and Dubowitz et al. (2014) show that mere distance to healthy food options does not necessarily influence eating habits, especially in the context of two urban, african american communities in Pittsburgh. That is, while there were no supermarkets with healthy options in those neighborhoods, people traveled outside their neighborhoods to shop. Black and Macinko (2008) review the literature and find no consistent evidence on the relationship between access to healthy foods and obesity. Lee (2012) suggests that access to health or unhealthy food does not influence childhood obesity.
 
-In light of these arguments, we analyze the relationship between access to healthy food and health outcomes like obesity and diabetes across counties in the state of Virginia between 2011 and 2018. Advocates of the food desert concept postulate access has a negative effect on these health outcomes. However, we find no relationship between these two variables after accounting for median household income, access to recreational facilities, etc. Our results support earlier studies that show food deserts are not as burdensome as advocates and policymakers make them out to be. This is especially because, in VA, people have access to supermarkets within and without their counties. At the same time, while we find no relationship between access and obesity at the county level, this does not preclude the existence of food deserts. They might still exist within a neighborhood, but our results challenge naive conclusions regarding food deserts and negative health outcomes like obesity.
+In light of these arguments, we analyze the relationship between access to healthy food and health outcomes like diabetes across counties in the state of Virginia between 2011 and 2018. Advocates of the food desert concept postulate access has a negative effect on health outcomes. However, we find no relationship between diabetes and access to healthy foods after accounting for obesity, median household income, access to recreational facilities, etc. Our results support earlier studies that show food deserts are not as burdensome as advocates and policymakers make them out to be. This is especially because, in VA, people have access to supermarkets within and without their counties. At the same time, while we find no evidence of food deserts at the county level, this does not preclude the existence of food deserts within a neighborhood. Our results challenge naive conclusions regarding food deserts and negative health outcomes like obesity.
 
 # Data, Model, Results
 
-To test the hypothesis that living in a food desert leads to adverse health outcomes we specify the following instrumental variable panel model where $HealthOutcome$ is the percent of adults with diabetes; $HealthyFoodAccess$ is the percent of the population without access to healthy food options, and $AdultObesity$ is the percent of adults with reported BMI in excess of 30. 
+To test the hypothesis that living in a food desert leads to adverse health outcomes---and to attenuate concerns regarding endogeneity---we specify the following instrumental variable panel model where $HealthOutcome$ is the percent of adults with diabetes; $HealthyFoodAccess$ is the percent of the population without access to healthy food options, and $AdultObesity$ is the percent of adults with reported BMI in excess of 30.
 
+```{=tex}
 \begin{equation}
 \tag{1}
 \mathit{Health Outcome_{i,t}} = \beta_0 
@@ -60,9 +67,10 @@ To test the hypothesis that living in a food desert leads to adverse health outc
 + \beta_2\mathbf{AdultObesity}_{i,t} 
 + \epsilon_{i,t}
 \end{equation}
+```
+Where adult obesity is instrumented by
 
-Were adult obesity is instrumented by
-
+```{=tex}
 \begin{equation}
 \mathit{AdultObesity_{i,t}} = \gamma_0 
 + \gamma_1\mathit{Healthy Food Access}_{i,t} 
@@ -75,8 +83,8 @@ Were adult obesity is instrumented by
 + \nu_{i,t}
 \tag{2}
 \end{equation}
-
-The data for our empirical analysis comes from County Health Rankings & Roadmaps (@).  We have annual data for all counties in Virginia from 2011 to 2018.  
+```
+The data for our empirical analysis comes from County Health Rankings & Roadmaps. We have annual data for all counties in Virginia from 2011 to 2018, and we report descriptive statistics in the Appendix.
 
 We estimate equation (1) as:
 
@@ -96,10 +104,9 @@ food_desert %>%
   summary()
 ```
 
-We cannot reject $H_0: \beta_1=0$ suggesting that lack of access to healthy food options affects.  So the lack of access ot healthy food options does not appear to effect the percentage of the population with diabetes.
+We cannot reject $H_0: \beta_1=0$ suggesting that the access to healthy food options does not appear to effect the percentage of the population with diabetes.
 
-To assess the instruments for $\mathit{AdultObesity}$, measured as the percentage of adults the report a BMI greater than 30, we estimated equation (2). With the variables measured as follows: $\mathit{HealthyFoodAccess}$ as the percent of the population without access to healthy food options, $\mathit{PhysicalActivity}$ as percentage of adults aged 20 and over reporting no leisure‐time physical activity, $\mathit{PopOver65}$ as the percentage of the population over 65 years of age, $\mathit{MedianHouseholdIncome}$ as median household income in thousands of dollars, $\mathit{AccessRecreationalFacilities}$ as 
-percentage of population with adequate access to locations for physical activity, $\mathit{AdultSmokers}$ as percent of adults who are current smokers, and $\mathit{ExcessiveDrinking}$ as percent of adults reporting binge or heavy drinking.  
+To assess the instruments for $\mathit{AdultObesity}$, we estimated equation (2). With the variables measured as follows: $\mathit{HealthyFoodAccess}$ as the percent of the population without access to healthy food options, $\mathit{PhysicalActivity}$ as percentage of adults aged 20 and over reporting no leisure‐time physical activity, $\mathit{PopOver65}$ as the percentage of the population over 65 years of age, $\mathit{MedianHouseholdIncome}$ as median household income in thousands of dollars, $\mathit{AccessRecreationalFacilities}$ as percentage of population with adequate access to locations for physical activity, $\mathit{AdultSmokers}$ as percent of adults who are current smokers, and $\mathit{ExcessiveDrinking}$ as percent of adults reporting binge or heavy drinking.
 
 ```{r iv-reg}
 food_desert %>%
@@ -117,10 +124,11 @@ food_desert %>%
  
 ```
 
-While we can reject $H_0: \gamma_1=\dotsm=\gamma_8=0$, the *F-statistic* is less than 10 suggesting weak instruments.  According we will estimate equation (1) a panel model with controls and IV panel model.  
+While we can reject $H_0: \gamma_1=\dotsm=\gamma_8=0$, the *F-statistic* is less than 10, which suggests weak instruments. 
 
-So, we estimate equation (3)
+Accordingly we estimate equation (1) with a panel model with controls and as an IV panel model. So, we estimate equation (3)
 
+```{=tex}
 \begin{equation}
 \mathit{Health Outcome_{i,t}} = \delta_0 
 + \delta_1\mathit{Healthy Food Access}_{i,t} 
@@ -134,7 +142,7 @@ So, we estimate equation (3)
 + \omega_{i,t}
 \tag{3}
 \end{equation}
-
+```
 ```{r eq-3}
 food_desert %>%
   filter(year > 2011) %>%
@@ -151,16 +159,17 @@ food_desert %>%
   summary()
 ```
 
-We cannot reject $H_0:\delta=0$. Lack of access to healthy food options does not seem to affect the health outcome of adult diabetes. 
+We cannot reject $H_0:\delta=0$. Lack of access to healthy food options does not seem to affect the health outcome of adult diabetes.
 
 # Discussion and Conclusion
 
-Our results suggest arguments related to food deserts are overstated. That is, there is no statistical relationship between access to healthy foods and adverse health outcomes like obesity and diabetes. One reason for these results might simply be that while people live in counties with less access to healthy foods, they adjust their shopping habits to acquire their desired food bundle. To the extent there are widely-used substitutes for healthy eating that are not measured with our measures of grocery stores, e.g., cross-county shopping, delivery services, people might still be able to maintain a healthy lifestyle, they can avoid obesity and diabetes, regardless of whether there is a food desert. At the same time, such substitutes might be lacking, which limits general conclusions. 
+Our results suggest arguments related to food deserts are overstated. That is, we find no statistical relationship between access to healthy foods and adverse health outcomes like diabetes. Physical activity, recreation, and obesity, however, retain some explanatory power, which suggests more important factors of diabetes than access to healthy foods.
 
-Our data from Virginia covers counties with various demographic characteristics; while we suggest these results are not biased by being from Virginia, we do not show this. In future research we plan to extend our model to other states, e.g., states with different levels of median income, demographics, and institutions to examine the validity of our model. For example, a comparison of our results in Virginia with results from other southern states might make the argument stronger. 
+Additionally, these results might also suggest that while people live in counties with less access to healthy foods, they adjust their shopping habits to acquire their desired food bundle. To the extent there are widely-used substitutes for healthy eating that are not measured with our measures of grocery stores, e.g., cross-county shopping, delivery services, people might still be able to maintain a healthy lifestyle from which they can avoid diabetes, regardless of whether there is a food desert. At the same time, such substitutes might be lacking or immeasurable, which limits general conclusions.
 
-# Appendix: Desriptive Statistics
+Our data from Virginia covers counties with various demographic characteristics; while we suggest these results are not biased by being from Virginia, we do not show this. In future research we plan to extend our model to other states, e.g., states with different levels of median income, demographics, and institutions to examine the validity of our model. For example, a comparison of our results in Virginia with results from other southern states might make the argument stronger.
 
+# Appendix: Descriptive Statistics
 
 ```{r desc-stats, message=FALSE, results='asis'}
 food_desert %>% 
